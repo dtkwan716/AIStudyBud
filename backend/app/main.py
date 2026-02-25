@@ -26,7 +26,7 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    reply = f"Echo: {request.message}"
+    reply = f"{request.message}"
     with psycopg.connect(DB_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(

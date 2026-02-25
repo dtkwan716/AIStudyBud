@@ -10,6 +10,7 @@ export default function Home() {
   const fetchMessages = async () => {
     const response = await fetch("http://localhost:8000/messages")
     const data = await response.json()
+    console.log(data)
     setMessages(data)
   }
 
@@ -28,15 +29,40 @@ export default function Home() {
   }
 
   return(
+    <div className="flex flex-col h-screen">
+      <div className="flex-1 overflow-y-auto">
+      {messages.map((m: any) => (
+        <div key={m.id} className="flex flex-col gap-4 p-6">
+          <div className="self-end max-w-xs bg-blue-500 text-white px-4 py-2 rounded-xl"
+            style={{  
+              border: "1px solid black",
+              borderRadius: "10px",
+              borderWidth: "2px",
+              padding: "10px",
+            }}>
+              <p>{m.message}</p>
+          </div>
+          <div className="self-start max-w-xs bg-white border px-4 py-2 rounded-xl"
+            style={{
+              border: "1px solid black",
+              borderRadius: "10px",
+              borderWidth: "2px",
+              padding: "10px",
+            }}>
+            <p className="self-start">{m.reply}</p>
+          </div>
+      </div>
+      ))}
+  </div>
     <div className="p-6 flex flex-col gap-4">
     <input
       type = "text"
       value = {message}
       onChange = {(e) => setMessage(e.target.value)}
-      className="border border-gray p-2 rounded"
-      placeholder="Testing"
-/>
-    <button 
+      className="border border-gray 300 p-2 rounded"
+      placeholder="Enter your message..."
+    />
+     <button 
     style={{
         backgroundColor: 'white',
         color: 'black',
@@ -49,14 +75,7 @@ export default function Home() {
     onClick={sendMessage}>
       Send
     </button>
-    <div className = "flex flex-col gap-2">
-      {messages.map((m: any) => (
-        <div key={m.id} className="border border-gray p-2 rounded">
-        <p><strong>User:</strong>{ m.message}</p>
-        <p><strong>AI:</strong>{ m.reply}</p>
-        </div>
-      ))}
     </div>
-  </div>
-  )
+    </div>
+)
 }
