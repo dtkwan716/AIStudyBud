@@ -42,7 +42,7 @@ def chat(request: ChatRequest):
 def get_messages():
     with psycopg.connect(DB_URL) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, message, reply, created_at FROM messages ORDER BY id DESC LIMIT 20;")
+            cur.execute("SELECT id, message, reply, created_at FROM ( SELECT id, message, reply, created_at FROM messages ORDER BY id DESC LIMIT 20) recent ORDER BY id ASC;")
             rows = cur.fetchall()
 
     return [

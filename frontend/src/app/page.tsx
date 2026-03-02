@@ -1,12 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { send } from "process";
+import { useEffect, useState, useRef } from "react";
 
 export default function Home() {
   const [message, setMessage] = useState("")
   const [reply, setReply] = useState("")
-  const[messages, setMessages] = useState([])
-
+  const [messages, setMessages] = useState([])
+  const chatRef = useRef<HTMLDivElement>(null)
+  const [loading, setLoading] = useState(false)
   const fetchMessages = async () => {
     const response = await fetch("http://localhost:8000/messages")
     const data = await response.json()
@@ -18,19 +20,35 @@ export default function Home() {
     fetchMessages()
   }, [])
 
+  useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const sendMessage = async () => {
-   await fetch("http://localhost:8000/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
-    })
-    await fetchMessages()
-    setMessage("")
+   if(message.trim() === ""){
+    return
+   }
+    setLoading(true)
+    try{
+    await fetch("http://localhost:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      })
+      await fetchMessages()
+      setMessage("")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return(
     <div className="flex flex-col h-screen">
-      <div className="flex-1 overflow-y-auto">
+      <div 
+      ref={chatRef}
+      className="flex-1 overflow-y-auto">
       {messages.map((m: any) => (
         <div key={m.id} className="flex flex-col gap-4 p-6">
           <div className="self-end max-w-xs bg-blue-500 text-white px-4 py-2 rounded-xl"
@@ -56,6 +74,12 @@ export default function Home() {
   </div>
     <div className="p-6 flex flex-col gap-4">
     <input
+    onKeyDown={(e) => {
+      if(e.key === "Enter" && !loading){
+        sendMessage()
+      }
+    }}
+    disabled={loading}
       type = "text"
       value = {message}
       onChange = {(e) => setMessage(e.target.value)}
@@ -72,8 +96,9 @@ export default function Home() {
         borderWidth: '2px',
         cursor: 'pointer',
     }}
-    onClick={sendMessage}>
-      Send
+    onClick={sendMessage}
+    disabled={loading}>
+      {loading ? "Sending..." : "Send"}
     </button>
     </div>
     </div>
