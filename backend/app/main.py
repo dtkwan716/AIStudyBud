@@ -1,4 +1,4 @@
-from backend.app.chat_service import gen_reply
+from app.chat_service import gen_reply
 from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
