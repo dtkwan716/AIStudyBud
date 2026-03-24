@@ -17,14 +17,14 @@ app.add_middleware(
 )
 
 class ChatRequest(BaseModel):
+    chat_id: int
     message: str
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    reply = gen_reply(request.message)
-    insert_message(request.message, reply)
+    reply = gen_reply(request.chat_id, request.message)
     return{"response": reply}
 
-@app.get("/messages")
-def get_messages():
-    return db_get_messages()
+@app.get("/messages/{chat_id}")
+def get_messages(chat_id: int):
+    return db_get_messages(chat_id)
