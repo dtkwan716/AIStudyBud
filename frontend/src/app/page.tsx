@@ -16,12 +16,22 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
   const chatRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
+  const[error, setError] = useState<string>("")
   const chatId = 1
+
   const fetchMessages = async () => {
+    try {
     const response = await fetch(`http://localhost:8000/messages/${chatId}`)
     const data = await response.json()
+    if (!response.ok) {
+      throw new Error("Failed to fetch messages")
+    }
     console.log(data)
     setMessages(data)
+  } catch (error){
+    console.error("Error fetching messages:", error)
+    setError("Backend is not running please try again later.")
+  }
   }
 
   useEffect(() => {
@@ -38,18 +48,22 @@ export default function Home() {
    if(message.trim() === ""){
     return
    }
+    setError("")
     setLoading(true)
     try{
-    await fetch("http://localhost:8000/chat", {
+    const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: chatId, message })
       })
-    
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
       await fetchMessages()
       setMessage("")
     } catch (error) {
       console.error("Error sending message:", error)
+      setError("Backend is not running please try again later.")
     } finally {
       setLoading(false)
     }
@@ -84,6 +98,9 @@ export default function Home() {
       className="border border-gray-300 p-2 rounded"
       placeholder="Enter your message..."
     />
+    {error && (
+      <p style={{ color: "red" }}>{error}</p>
+    )}
      <button 
     style={{
         backgroundColor: 'white',
