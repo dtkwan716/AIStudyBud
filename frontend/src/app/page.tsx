@@ -19,6 +19,8 @@ export default function Home() {
   const[error, setError] = useState<string>("")
   const [selectedPersona, setSelectedPersona] = useState("Ed")
 
+  const personaSelected = selectedPersona === "Ed" ? "Explaining Eddie" : selectedPersona === "Quin" ? "Quizzing Quincy" : "Tutoring Theodore"
+
   const fetchMessages = async (personaId: string) => {
     try {
     const response = await fetch(`http://localhost:8000/messages/${personaId}`)
@@ -70,60 +72,89 @@ export default function Home() {
   }
 
   return(
-    <div className="flex flex-col h-screen">
-      <div 
-      ref={chatRef}
-      className="flex-1 overflow-y-auto">
-      {messages.map((m) => (
-        <div key={m.id} className={`flex mb-4 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-        <div className={`max-w-xs px-4 py-2 rounded-xl border-2 border-black ${m.role === "user" ? "bg-blue-500 text-white" : "bg-white text-black"}`}>
-          <p>{m.content}</p>
-        </div>
-      </div>
-      ))}
-    </div>
-
-    <div className="p-4 flex gap-2 border-b">
-      <button onClick={() => setSelectedPersona("Ed")}>Explaining Eddie</button>
-      <button onClick={() => setSelectedPersona("Quin")}>Quizzing Quincy</button>
-      <button onClick={() => setSelectedPersona("Theo")}>Tutoring Theodore</button>
-      <h2 className = "p-2 font-bold">
-        Messaging {selectedPersona === "Ed" ? "Explaining Eddie" : selectedPersona === "Quin" ? "Quizzing Quincy" : "Tutoring Theodore"}
-      </h2>
-    </div>
-
-
-    <div className="p-6 flex flex-col gap-4">
-    <input
-    onKeyDown={(e) => {
-      if(e.key === "Enter" && !loading){
-        sendMessage()
-      }
-    }}
-    disabled={loading}
-      type = "text"
-      value = {message}
-      onChange = {(e) => setMessage(e.target.value)}
-      className="border border-gray-300 p-2 rounded"
-      placeholder="Enter your message..."
-    />
-    {error && (
-      <p style={{ color: "red" }}>{error}</p>
-    )}
-     <button 
-    style={{
-        backgroundColor: 'white',
-        color: 'black',
-        padding: '10px 20px',
-        border: '1px solid black',
-        borderRadius: '10px',
-        borderWidth: '2px',
-        cursor: 'pointer',
-    }}
-    onClick={sendMessage}
-    disabled={loading}>
-      {loading ? "Sending..." : "Send"}
-    </button>
+    <div className="h-screen bg-[#f2f2f5] p-4">
+      <div className="mx-auto flex h-full max-w-7xl overflow-hidden rounded-3xl border border-black/5 bg-white shadow-lg">
+        <aside className="w-[320px] border-r border-black/5 bg-[#f2f2f2]">
+          <div className="p-4 border-b font-bold">
+            Study Buddies
+          </div>
+          <div className="p-4 flex flex-col gap-2">
+            <button
+              onClick={() => setSelectedPersona("Ed")}
+              className={`rounded-xl px-3 py-2 text-left ${
+                selectedPersona === "Ed" ? "bg-black/10" : "hover:bg-black/5"
+              }`}
+              > Explaining Eddie
+            </button>
+            <button
+              onClick={() => setSelectedPersona("Quin")}
+              className={`rounded-xl px-3 py-2 text-left ${
+                selectedPersona === "Quin" ? "bg-black/10" : "hover:bg-black/5"
+              }`}
+            >
+              Quizzing Quincy
+            </button>
+            <button
+              onClick={() => setSelectedPersona("Theo")}
+              className={`rounded-xl px-3 py-2 text-left ${
+                selectedPersona === "Theo" ? "bg-black/10" : "hover:bg-black/5"
+              }`}
+              >Tutoring Theodore
+            </button>
+          </div> 
+        </aside>
+        <section className="flex flex-1 flex-col">
+          <div className="p-4 border-b font-semibold text-neutral-700">
+            {selectedPersona === "Ed" ? "Explaining Eddie" : selectedPersona === "Quin" ? "Quizzing Quincy" : "Tutoring Theodore"}
+          </div>
+          <div ref={chatRef} className="flex-1 overflow-y-auto p-4 bg-neutral-100">
+            {messages.map((m) => (
+              <div key={m.id} className={`flex mb-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[70%] px-4 py-2 rounded-2xl border border-black/10 shadow-lg ${m.role === "user" ? "bg-blue-500 text-white" : "bg-white text-black"}`}>
+                <p>{m.content}</p>
+              </div>
+            </div>
+            ))}
+          </div>
+          <div className="p-6 flex gap-3 border-t">
+            <input
+              onKeyDown={(e) => {
+                if(e.key === "Enter" && !loading){
+                  sendMessage()
+                }
+              }}
+              disabled={loading}
+              type = "text"
+              value = {message}
+              onChange = {(e) => setMessage(e.target.value)}
+              className="flex-1 border border-gray-300 px-4 p-2 rounded-full shadow-sm text-neutral-800"
+              placeholder="Enter your message..."
+            />
+            { error && (
+              <p style={{ color: "red" }}>{error}</p>
+            )}
+            <button 
+              style={{
+                backgroundColor: 'white',
+                color: 'black',
+                padding: '10px 20px',
+                border: '1px solid black',
+                borderRadius: '9999px',
+                borderWidth: '2px',
+                cursor: 'pointer',
+              }}
+              onClick={sendMessage}
+              disabled={loading}>
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent"></span>
+                    Sending...
+                  </span>
+                ) : ("Send"
+                )}
+            </button>
+          </div>
+        </section>
     </div>
     </div>
 )
