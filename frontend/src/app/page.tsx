@@ -17,11 +17,11 @@ export default function Home() {
   const chatRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
   const[error, setError] = useState<string>("")
-  const chatId = 1
+  const [selectedPersona, setSelectedPersona] = useState("Ed")
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (personaId: string) => {
     try {
-    const response = await fetch(`http://localhost:8000/messages/${chatId}`)
+    const response = await fetch(`http://localhost:8000/messages/${personaId}`)
     const data = await response.json()
     if (!response.ok) {
       throw new Error("Failed to fetch messages")
@@ -35,8 +35,8 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetchMessages()
-  }, [])
+    fetchMessages(selectedPersona)
+  }, [selectedPersona])
 
   useEffect(() => {
     if (chatRef.current) {
@@ -54,12 +54,12 @@ export default function Home() {
     const res = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, message })
+        body: JSON.stringify({ persona_id: selectedPersona, message })
       })
       if (!res.ok) {
         throw new Error("Network response was not ok");
       }
-      await fetchMessages()
+      await fetchMessages(selectedPersona)
       setMessage("")
     } catch (error) {
       console.error("Error sending message:", error)
@@ -81,6 +81,15 @@ export default function Home() {
         </div>
       </div>
       ))}
+    </div>
+
+    <div className="p-4 flex gap-2 border-b">
+      <button onClick={() => setSelectedPersona("Ed")}>Explaining Eddie</button>
+      <button onClick={() => setSelectedPersona("Quin")}>Quizzing Quincy</button>
+      <button onClick={() => setSelectedPersona("Theo")}>Tutoring Theodore</button>
+      <h2 className = "p-2 font-bold">
+        Messaging {selectedPersona === "Ed" ? "Explaining Eddie" : selectedPersona === "Quin" ? "Quizzing Quincy" : "Tutoring Theodore"}
+      </h2>
     </div>
 
 

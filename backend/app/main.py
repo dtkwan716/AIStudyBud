@@ -17,14 +17,17 @@ app.add_middleware(
 )
 
 class ChatRequest(BaseModel):
-    chat_id: int
+    persona_id: str
     message: str
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    reply = gen_reply(request.chat_id, request.message)
-    return{"response": reply}
+    try:
+        reply = gen_reply(request.persona_id, request.message)
+        return{"response": reply}
+    except Exception as e:
+        return{"error": str(e)}
 
-@app.get("/messages/{chat_id}")
-def get_messages(chat_id: int):
-    return db_get_messages(chat_id)
+@app.get("/messages/{persona_id}")
+def get_messages(persona_id: str):
+    return db_get_messages(persona_id)
