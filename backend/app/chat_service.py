@@ -32,7 +32,7 @@ def gen_reply(persona_id: str, user_message:str) -> str:
         "content": persona["system_prompt"]
     })
     response = chat(
-        model='llama3.1:8b',
+        model='qwen2.5:3b',
         messages=messages,
         stream=False,
         )
